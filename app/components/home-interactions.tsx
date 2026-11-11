@@ -1,16 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { services } from "../lib/services";
 
 const stories = [
-  { name: "Marc", company: "Visionary Outdoor Solutions", image: "/figma/testimonial-marc.png" },
-  { name: "Craig", company: "Allendale Electrical", image: "/figma/testimonial-craig.png" },
-  { name: "Kane", company: "Latham Construction", image: "/figma/testimonial-kane.png" },
+  { name: "Marc", company: "Visionary Outdoor Solutions", image: "/figma/testimonial-marc.png", featuredImage: "/figma/pages/portfolio-video-thumbnail.png", quote: "We went from relying on word of mouth to having a proper engine behind the business. The quality of enquiry changed almost immediately." },
+  { name: "Craig", company: "Allendale Electrical", image: "/figma/testimonial-craig.png", featuredImage: "/figma/pages/portfolio-video-thumbnail1.png", quote: "They made us look like the business we’d grown into. The capability work gave us confidence in bigger rooms and bigger tenders." },
+  { name: "Kane", company: "Latham Construction", image: "/figma/testimonial-kane.png", featuredImage: "/figma/pages/portfolio-video-thumbnail2.png", quote: "No buzzwords. Just a smart team who got under the bonnet, challenged us and helped us build something that actually works." },
 ];
 
 export function ScrollReveal() {
+  const pathname = usePathname();
   useEffect(() => {
     const items = document.querySelectorAll<HTMLElement>("[data-reveal]");
     const observer = new IntersectionObserver((entries) => {
@@ -23,7 +25,7 @@ export function ScrollReveal() {
     }, { threshold: 0.1, rootMargin: "0px 0px -6%" });
     items.forEach((item) => observer.observe(item));
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
   return null;
 }
 
@@ -69,7 +71,7 @@ function MediaDialog({ title, image, onClose }: { title: string; image: string; 
       <div className="media-dialog__panel" onMouseDown={(event) => event.stopPropagation()}>
         <button type="button" className="media-dialog__close" onClick={onClose} aria-label="Close">×</button>
         <div className="relative aspect-video"><Image src={image} alt="" fill sizes="90vw" className="object-cover" /></div>
-        <div className="media-dialog__copy"><span>GMFB story</span><h3>{title}</h3><p>Full case study video coming soon. Talk to us about what a practical growth system could look like for your business.</p><a className="gmfb-button" href="mailto:support@gmfb.co.nz?subject=Tell%20me%20more">Tell me more <span aria-hidden="true">↗</span></a></div>
+        <div className="media-dialog__copy"><span>GMFB story</span><h3>{title}</h3><p>Full case study video coming soon. Talk to us about what a practical growth system could look like for your business.</p><a className="gmfb-button" href="mailto:support@gmfb.co.nz?subject=Tell%20me%20more">Tell me more</a></div>
       </div>
     </div>
   );
@@ -89,19 +91,19 @@ export function Showreel() {
   );
 }
 
-export function StoryGrid() {
+export function StoryGrid({ featured = false }: { featured?: boolean }) {
   const [selected, setSelected] = useState<number | null>(null);
   return (
     <>
-      <div className="story-grid" data-reveal>
+      <div className={`story-grid${featured ? " story-grid--featured" : ""}`} data-reveal>
         {stories.map((story, index) => (
           <button key={story.name} type="button" className="story-card" onClick={() => setSelected(index)} aria-label={`Open ${story.name}'s story`}>
-            <span className="story-card__image"><Image src={story.image} alt={`${story.name} from ${story.company}`} fill sizes="(max-width: 800px) 100vw, 33vw" className="object-cover" /><span className="absolute inset-0 bg-black/35" /><PlayIcon /></span>
-            <span className="story-card__meta"><strong>{story.name}</strong><span>{story.company}</span></span>
+            <span className="story-card__image"><Image src={featured ? story.featuredImage : story.image} alt={`${story.name} from ${story.company}`} fill sizes={featured ? "(max-width: 800px) 100vw, 50vw" : "(max-width: 800px) 100vw, 33vw"} className="object-cover" /><span className="absolute inset-0 bg-black/35" /><PlayIcon /></span>
+            {featured ? <span className="story-card__copy"><span className="story-card__quote">“{story.quote}”</span><span className="story-card__meta"><strong>{story.name}</strong><span>{story.company}</span></span></span> : <span className="story-card__meta"><strong>{story.name}</strong><span>{story.company}</span></span>}
           </button>
         ))}
       </div>
-      {selected !== null && <MediaDialog title={`${stories[selected].name} — ${stories[selected].company}`} image={stories[selected].image} onClose={() => setSelected(null)} />}
+      {selected !== null && <MediaDialog title={`${stories[selected].name} — ${stories[selected].company}`} image={featured ? stories[selected].featuredImage : stories[selected].image} onClose={() => setSelected(null)} />}
     </>
   );
 }

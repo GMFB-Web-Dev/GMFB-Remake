@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+import { Suspense } from "react";
+import { Header } from "./components/header";
+import { SiteFooter } from "./components/site-footer";
+import { ScrollReveal } from "./components/home-interactions";
 import "./globals.css";
+import "./inner-pages.css";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -20,7 +25,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${manrope.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col"><Suspense><Header /><ScrollReveal /></Suspense>{children}<SiteFooter /></body>
     </html>
   );
 }

@@ -1,27 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BrandMark } from "./brand-mark";
-import { services } from "../lib/services";
-
-type NavItem = { label: string; href: string; children?: { label: string; href: string }[] };
-
-const navItems: NavItem[] = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about", children: [
-    { label: "About GMFB", href: "#about" },
-    { label: "Client stories", href: "#client-stories" },
-  ] },
-  { label: "Services", href: "#services", children: [
-    { label: "All services", href: "#services" },
-    ...services.map((service) => ({ label: service.title, href: `#${service.id}` })),
-  ] },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Blog", href: "#client-stories" },
-  { label: "Contact", href: "#contact" },
-];
+import { navigation as navItems, type NavItem } from "../lib/navigation";
 
 export function Header() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdown, setDropdown] = useState<string | null>(null);
@@ -44,7 +30,7 @@ export function Header() {
     const closeOutside = (event: PointerEvent) => {
       if (event.target instanceof Node && !headerRef.current?.contains(event.target)) setDropdown(null);
     };
-    const desktop = window.matchMedia("(min-width: 901px)");
+    const desktop = window.matchMedia("(min-width: 1101px)");
     const resetNavigation = () => {
       setOpen(false);
       setDropdown(null);
@@ -74,10 +60,11 @@ export function Header() {
 
   const renderItem = (item: NavItem, index: number, mobile = false) => {
     const label = mobile ? <span className="mobile-nav__label"><span className="mobile-nav__number">0{index + 1}</span>{item.label}</span> : item.label;
-    if (!item.children) return <a key={item.label} className={mobile ? "mobile-nav__link" : "nav-link"} href={item.href} onClick={closeNavigation}>{label}</a>;
+    const current = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+    if (!item.children) return <Link key={item.label} className={mobile ? "mobile-nav__link" : "nav-link"} href={item.href} aria-current={current ? "page" : undefined} onClick={closeNavigation}>{label}</Link>;
 
     const expanded = dropdown === item.label;
-    const panelId = `${mobile ? "mobile" : "desktop"}-${item.label.toLowerCase()}-dropdown`;
+    const panelId = `${mobile ? "mobile" : "desktop"}-${item.label.toLowerCase().replaceAll(" ", "-")}-dropdown`;
     return (
       <div
         key={item.label}
@@ -103,9 +90,12 @@ export function Header() {
           }
         }}
       >
+        <div className="nav-dropdown__label">
+        <Link href={item.href} className={mobile ? "mobile-nav__link" : "nav-link"} aria-current={current ? "page" : undefined} onClick={closeNavigation}>{label}</Link>
         <button
           type="button"
           className="nav-dropdown__trigger"
+          aria-label={`${item.label} submenu`}
           aria-expanded={expanded}
           aria-controls={panelId}
           onClick={(event) => {
@@ -124,10 +114,11 @@ export function Header() {
             }
           }}
         >
-          {label}<svg className="nav-dropdown__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          <svg className="nav-dropdown__chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m3 4.5 3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
+        </div>
         <div className="nav-dropdown__panel" id={panelId} hidden={!expanded}>
-          {item.children.map((child) => <a key={child.href} href={child.href} onClick={closeNavigation}>{child.label}<span aria-hidden="true">↗</span></a>)}
+          {item.children.map((child) => <Link key={child.href} href={child.href} onClick={closeNavigation}>{child.label}</Link>)}
         </div>
       </div>
     );
@@ -135,21 +126,21 @@ export function Header() {
 
   return (
     <header ref={headerRef} className={`home-header${scrolled ? " home-header--scrolled" : ""}`}>
-      <a href="#home" className="relative z-50" onClick={closeNavigation}><BrandMark /></a>
+      <Link href="/" className="relative z-50" onClick={closeNavigation}><BrandMark /></Link>
       <nav className="home-header__desktop" aria-label="Primary navigation">
         {navItems.map((item, index) => renderItem(item, index))}
-        <a className="gmfb-button" href="mailto:support@gmfb.co.nz?subject=Book%20a%20call">Book a call <span aria-hidden="true">↗</span></a>
+        <Link className="gmfb-button" href="/contact-us#enquiry" onClick={closeNavigation}>Book a call</Link>
       </nav>
-      <button className="menu-toggle" type="button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => { setOpen((value) => !value); setDropdown(null); }}>
+      <button className="menu-toggle" type="button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => { setOpen((value) => !value); setDropdown(null); }}>
         <span className={open ? "rotate-45 translate-y-[7px]" : ""} />
         <span className={open ? "opacity-0" : ""} />
         <span className={open ? "-rotate-45 -translate-y-[7px]" : ""} />
       </button>
-      <div className={`mobile-nav ${open ? "mobile-nav--open" : ""}`}>
+      <div id="mobile-menu" className={`mobile-nav ${open ? "mobile-nav--open" : ""}`}>
         <nav aria-label="Mobile navigation">
           {navItems.map((item, index) => renderItem(item, index, true))}
         </nav>
-        <a className="gmfb-button" href="mailto:support@gmfb.co.nz?subject=Book%20a%20call" onClick={closeNavigation}>Book a call <span aria-hidden="true">↗</span></a>
+        <Link className="gmfb-button" href="/contact-us#enquiry" onClick={closeNavigation}>Book a call</Link>
       </div>
     </header>
   );
