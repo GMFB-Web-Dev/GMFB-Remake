@@ -1,9 +1,13 @@
-import Image from "next/image";
-
 export function BrandMark({ large = false }: { large?: boolean }) {
   return (
-    <span className={large ? "brand-mark brand-mark--large" : "brand-mark"}>
-      <Image src="/figma/gmfb-logo.png" alt="GMFB — Great Marketing for Businesses" fill sizes={large ? "210px" : "188px"} loading={large ? "lazy" : "eager"} />
-    </span>
+    <svg
+      className={large ? "brand-mark brand-mark--large" : "brand-mark"}
+      viewBox="0 390 1254 450"
+      role="img"
+      aria-label="GMFB — Great Marketing for Businesses"
+    >
+      {/* Frame the artwork without the supplied PNG's empty top and bottom margins. */}
+      <image href="/assets/gmfb-logo.png" width="1254" height="1254" />
+    </svg>
   );
 }

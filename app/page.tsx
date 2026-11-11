@@ -31,11 +31,11 @@ export default function Home() {
   return (
     <main id="home" className="w-full overflow-x-clip bg-[#0b0b0f] text-[#f7f7f5]">
       <ScrollReveal />
+      <Header />
 
       <section className="home-hero" data-node-id="2004:7371">
         <Image src="/figma/home-hero.png" alt="GMFB meeting room with a laptop displaying the GMFB brand" fill priority sizes="100vw" className="object-cover object-center" />
         <div className="absolute inset-0 bg-black/60" />
-        <Header />
         <div className="home-hero__content" data-reveal>
           <h1><span>Get more</span><span className="text-[#8700ff]">f*kn business.</span></h1>
           <div className="flex flex-wrap gap-3"><ButtonLink href="#services">Services</ButtonLink><ButtonLink href="#contact">Contact</ButtonLink></div>

@@ -2,15 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
-const services = [
-  { number: "01", title: "Websites", copy: "Fast, clear websites that turn attention into enquiries." },
-  { number: "02", title: "Digital services", copy: "Digital campaigns and content built around commercial outcomes." },
-  { number: "03", title: "Lead generation", copy: "A stronger flow of the right opportunities for your team." },
-  { number: "04", title: "Sales systems", copy: "Simple follow-up systems that stop good leads going cold." },
-  { number: "05", title: "Tendering", copy: "Sharper capability and tender work for bigger opportunities." },
-  { number: "06", title: "Consulting & strategy", copy: "Commercial direction when the next move is not obvious." },
-];
+import { services } from "../lib/services";
 
 const stories = [
   { name: "Marc", company: "Visionary Outdoor Solutions", image: "/figma/testimonial-marc.png" },
@@ -42,12 +34,15 @@ export function ServiceList() {
       {services.map((service, index) => (
         <button
           key={service.number}
+          id={service.id}
           type="button"
           aria-expanded={active === index}
           className={`service-row ${active === index ? "service-row--active" : ""}`}
           onClick={() => setActive(active === index ? null : index)}
           onMouseEnter={() => setActive(index)}
           onMouseLeave={() => setActive(null)}
+          onFocus={() => setActive(index)}
+          onBlur={() => setActive(null)}
         >
           <span className="service-row__number">{service.number}</span>
           <span className="service-row__body"><strong>{service.title}</strong><span>{service.copy}</span></span>
